@@ -2,7 +2,7 @@
   "source_page": "https://www.gmpplus.org/feed-certification-scheme/scheme-documents/fsa-requirements/",
   "news_page": "https://www.gmpplus.org/publications/news/",
   "scope": "Todos os documentos R e TS da pagina GMP+ FSA Requirements (cobertura completa, com destaque para os de transporte)",
-  "last_checked": "2026-10-06",
+  "last_checked": "2026-11-04",
   "documents": [
     {
       "id": "r10",
@@ -73,7 +73,7 @@
       "code": "TS1.7",
       "title": "Monitoring - Aflatoxin risk classification list",
       "category": "Monitoramento / listas",
-      "version": "15.09.2026",
+      "version": "22.10.2026",
       "view_url": "https://www.gmpplus.org/feed-certification-scheme/scheme-documents/fsa-requirements/aflatoxine-b1-protocol/"
     },
     {
@@ -213,9 +213,37 @@
       "old_version": "20.07.2026",
       "new_version": "15.09.2026",
       "detected_at": "2026-10-06"
+    },
+    {
+      "id": "aflatoxine-b1-protocol",
+      "code": "TS1.7",
+      "title": "Monitoring - Aflatoxin risk classification list",
+      "old_version": "15.09.2026",
+      "new_version": "22.10.2026",
+      "detected_at": "2026-11-04"
     }
   ],
   "news_items": [
+    {
+      "url": "https://www.gmpplus.org/publications/news/last-reminder-share-your-feedback-with-us/",
+      "title": "Last reminder: share your feedback with us",
+      "date_published": "2026-10-27"
+    },
+    {
+      "url": "https://www.gmpplus.org/publications/news/welcome-epicea-as-a-new-gmpplus-registered-consultant/",
+      "title": "Welcome EPICE&A as a new GMP+ Registered Consultant",
+      "date_published": "2026-10-27"
+    },
+    {
+      "url": "https://www.gmpplus.org/publications/news/afla-b1-october-2026/",
+      "title": "Protocol Monitoring Aflatoxin B1 in maize and by-products of maize",
+      "date_published": "2026-10-22"
+    },
+    {
+      "url": "https://www.gmpplus.org/publications/news/temporary-low-water-measures-extended-until-31-december-2026/",
+      "title": "Temporary low-water measures extended until 31 December 2026",
+      "date_published": "2026-10-15"
+    },
     {
       "url": "https://www.gmpplus.org/publications/news/recognition-of-book-claim-and-mass-balance/",
       "title": "Recognition of Book & Claim and Mass Balance for responsible soy continues beyond 2026",
@@ -229,6 +257,11 @@
     {
       "url": "https://www.gmpplus.org/publications/news/help-us-to-improve-our-services-take-our-short-survey-in-your-language/",
       "title": "Share your feedback: Help us to improve our services, take our short survey in your language",
+      "date_published": "2026-09-28"
+    },
+    {
+      "url": "https://www.gmpplus.org/publications/news/the-first-company-to-be-certified-under-gmpplus-mi57-feed-lca/",
+      "title": "The first company to be certified under GMP+ MI5.7 Feed LCA",
       "date_published": "2026-09-28"
     },
     {
@@ -255,41 +288,6 @@
       "url": "https://www.gmpplus.org/publications/news/temporary-measures-due-to-low-water-levels/",
       "title": "Temporary measures due to low water levels in European rivers and canals",
       "date_published": "2026-08-13"
-    },
-    {
-      "url": "https://www.gmpplus.org/publications/news/registered-consultants-align-to-better-support/",
-      "title": "Registered Consultants align to better support GMP+ certified companies",
-      "date_published": "2026-07-28"
-    },
-    {
-      "url": "https://www.gmpplus.org/publications/news/new-eu-regulation-on-new-genomic-techniques-adopted/",
-      "title": "New EU regulation on new genomic techniques adopted",
-      "date_published": "2026-07-27"
-    },
-    {
-      "url": "https://www.gmpplus.org/publications/news/new-platform-features-my-early-warning-system-my-risk-assessments/",
-      "title": "New platform features: My Early Warning System & My Risk Assessments",
-      "date_published": "2026-07-27"
-    },
-    {
-      "url": "https://www.gmpplus.org/publications/news/celebrating-5-years-of-gmpplus-academy/",
-      "title": "Celebrating 5 Years of GMP+ Academy",
-      "date_published": "2026-07-27"
-    },
-    {
-      "url": "https://www.gmpplus.org/publications/news/gmpplus-product-list-passes-1-000-feed-materials/",
-      "title": "GMP+ Product List passes 1,000 feed materials",
-      "date_published": "2026-07-22"
-    },
-    {
-      "url": "https://www.gmpplus.org/publications/news/afla-b1-july-2026/",
-      "title": "Protocol Monitoring Aflatoxin B1 in maize and by-products of maize (July 2026)",
-      "date_published": "2026-07-21"
-    },
-    {
-      "url": "https://www.gmpplus.org/publications/news/contamination-of-maize-with-aflatoxin-b1-from-the-united-states/",
-      "title": "Contamination of maize with Aflatoxin B1 from the United States",
-      "date_published": "2026-07-09"
     }
   ],
   "news_log": [
@@ -352,6 +350,26 @@
     {
       "url": "https://www.gmpplus.org/publications/news/celebrating-5-years-of-gmpplus-academy/",
       "detected_at": "2026-10-06"
+    },
+    {
+      "url": "https://www.gmpplus.org/publications/news/last-reminder-share-your-feedback-with-us/",
+      "detected_at": "2026-11-04"
+    },
+    {
+      "url": "https://www.gmpplus.org/publications/news/welcome-epicea-as-a-new-gmpplus-registered-consultant/",
+      "detected_at": "2026-11-04"
+    },
+    {
+      "url": "https://www.gmpplus.org/publications/news/afla-b1-october-2026/",
+      "detected_at": "2026-11-04"
+    },
+    {
+      "url": "https://www.gmpplus.org/publications/news/temporary-low-water-measures-extended-until-31-december-2026/",
+      "detected_at": "2026-11-04"
+    },
+    {
+      "url": "https://www.gmpplus.org/publications/news/the-first-company-to-be-certified-under-gmpplus-mi57-feed-lca/",
+      "detected_at": "2026-11-04"
     }
   ]
 }
