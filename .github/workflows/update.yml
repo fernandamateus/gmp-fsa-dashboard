@@ -1,21 +1,41 @@
-name: Update GMP Data
+name: Atualizar dados GMP+ FSA
+
 on:
   schedule:
-    - cron: '0 9 5 * *'
-  workflow_dispatch:
+    - cron: '0 9 1 * *'   # todo dia 1 do mes, 09:00 UTC (05:00 em Cuiaba)
+  workflow_dispatch:       # permite rodar manualmente pela aba Actions
+
+permissions:
+  contents: write          # necessario para o bot fazer commit do data.json
+
+concurrency:
+  group: update-data
+  cancel-in-progress: false
+
 jobs:
   update:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-      - run: pip install requests beautifulsoup4
-      - run: python fetch_data.py
-      - run: |
-          git config user.email "bot@github.com"
-          git config user.name "Bot"
+          python-version: '3.12'
+
+      - name: Instalar dependencias
+        run: pip install requests beautifulsoup4
+
+      - name: Atualizar data.json
+        run: python fetch_gmp_data.py
+
+      - name: Commit e push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data.json
-          git commit -m "Update data" || true
-          git push
+          if git diff --cached --quiet; then
+            echo "Sem mudancas."
+          else
+            git commit -m "Atualizacao automatica GMP+ - $(date +'%d/%m/%Y')"
+            git push
+          fi
