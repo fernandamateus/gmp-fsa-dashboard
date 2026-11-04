@@ -1,324 +1,189 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GMP+ FSA - Painel de Monitoramento</title>
-<style>
-  :root{
-    --verde:#1f7a4d;
-    --verde-claro:#e7f5ec;
-    --ambar:#b5780a;
-    --ambar-claro:#fdf1de;
-    --azul:#1a5fa8;
-    --azul-claro:#e8f0fb;
-    --tinta:#1c2329;
-    --atenuado:#5f6b76;
-    --linha:#e3e7ea;
-    --fundo:#f7f8fa;
-    --cartao:#ffffff;
-  }
-  *{box-sizing:border-box;}
-  body{
-    margin:0;
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    background:var(--fundo);
-    color:var(--tinta);
-  }
-  .envolto{max-width:1040px;margin:0 auto;padding:32px 24px 64px;}
-  header{margin-bottom:28px;}
-  header h1{font-size:22px;margin:0 0 4px;}
-  header p{margin:0;color:var(--atenuado);font-size:14px;}
-  header a{color:var(--verde);text-decoration:none;}
-  header a:hover{text-decoration:underline;}
-  .meta{margin-top:10px;font-size:13px;color:var(--atenuado);}
-  .ressalvas{margin-top:14px;padding:12px 14px;background:var(--ambar-claro);border:1px solid #f0dcb0;border-radius:8px;font-size:13px;color:var(--tinta);line-height:1.5;}
-  .ressalvas strong{color:var(--ambar);}
-  .cartoes{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px;}
-  .cartao{background:var(--cartao);border:1px solid var(--linha);border-radius:10px;padding:16px 18px;}
-  .cartao .num{font-size:26px;font-weight:600;}
-  .cartao .rotulo{font-size:13px;color:var(--atenuado);margin-top:2px;}
-  .cartao.ok .num{color:var(--verde);}
-  .cartao.alterado .num{color:var(--ambar);}
-  .cartao.noticias .num{color:var(--azul);}
-  .controles{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center;}
-  .controles input[type=text]{
-    flex:1;min-width:180px;padding:9px 12px;border:1px solid var(--linha);border-radius:8px;font-size:14px;
-  }
-  .controles select{padding:9px 12px;border:1px solid var(--linha);border-radius:8px;font-size:14px;background:white;}
-  .controles label.toggle{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--atenuado);white-space:nowrap;}
-  table{width:100%;border-collapse:collapse;background:var(--cartao);border:1px solid var(--linha);border-radius:10px;overflow:hidden;}
-  thead th{
-    text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.04em;
-    color:var(--atenuado);padding:10px 14px;border-bottom:1px solid var(--linha);background:#fafbfc;
-  }
-  tbody td{padding:12px 14px;border-bottom:1px solid var(--linha);font-size:14px;vertical-align:middle;}
-  tbody tr:last-child td{border-bottom:none;}
-  tbody tr:hover{background:#fafbfc;}
-  .codigo{font-weight:600;}
-  .emblema{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:600;}
-  .emblema.geral{background:#eef1f4;color:var(--atenuado);}
-  .emblema.transporte{background:var(--verde-claro);color:var(--verde);}
-  .emblema.novo{background:var(--azul-claro);color:var(--azul);margin-left:6px;}
-  .status{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;}
-  .status.ok{color:var(--verde);}
-  .status.alterado{color:var(--ambar);}
-  .ponto{width:8px;height:8px;border-radius:50%;display:inline-block;}
-  .ponto.ok{background:var(--verde);}
-  .ponto.alterado{background:var(--ambar);}
-  a.verlink{color:var(--verde);text-decoration:none;font-size:13px;font-weight:600;}
-  a.verlink:hover{text-decoration:underline;}
-  a.notlink{color:var(--azul);text-decoration:none;}
-  a.notlink:hover{text-decoration:underline;}
-  secao.historico{margin-top:36px;}
-  secao.historico h2{font-size:16px;margin:0 0 12px;}
-  secao.noticias-secao{margin-top:36px;}
-  secao.noticias-secao h2{font-size:16px;margin:0 0 6px;}
-  secao.noticias-secao .noticias-meta{font-size:13px;color:var(--atenuado);margin-bottom:12px;}
-  .noticias-controles{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;align-items:center;}
-  .noticias-controles input[type=text]{
-    flex:1;min-width:180px;padding:8px 12px;border:1px solid var(--linha);border-radius:8px;font-size:14px;
-  }
-  .noticias-controles label.toggle{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--atenuado);white-space:nowrap;}
-  .vazio{color:var(--atenuado);font-size:14px;background:var(--cartao);border:1px dashed var(--linha);border-radius:10px;padding:18px;text-align:center;}
-  footer{margin-top:40px;font-size:12px;color:var(--atenuado);border-top:1px solid var(--linha);padding-top:16px;}
-  .semres{padding:24px;text-align:center;color:var(--atenuado);font-size:14px;}
-  .col-data{white-space:nowrap;color:var(--atenuado);font-size:13px;}
-</style>
-</head>
-<body>
-<div class="envolto">
-  <header>
-    <h1>GMP+ FSA &mdash; Painel de Monitoramento</h1>
-    <p>Acompanhamento de todos os documentos R e TS do GMP+ FSA Requirements e noticias oficiais dos ultimos 3 meses.</p>
-    <div class="meta">
-      Fonte oficial: <a id="link-fonte" href="#" target="_blank" rel="noopener">pagina de Documentos do Esquema</a>
-      &nbsp;&middot;&nbsp; Ultima verificacao: <strong id="ultima-verificacao">-</strong>
-      &nbsp;&middot;&nbsp; Verificacao automatica todo dia 1 do mes
-    </div>
-    <div class="ressalvas" id="ressalvas-verificacao">
-      <strong>Ressalvas da verificacao de 06/10/2026:</strong>
-      1 documento atualizado (TS1.7 &ndash; Monitoring: Aflatoxin risk classification list, versao 20.07.2026 &rarr; 15.09.2026).
-      1 noticia sobre IDTF (International Database for Transport of Feed) publicada nos ultimos 30 dias: "International Database for Transport of Feed (IDTF) &ndash; Newsletter 2/2026", de 24/09/2026.
-      Verificacao realizada manualmente em 06/10/2026 (a automacao mensal do repositorio ainda nao processou outubro).
-    </div>
-  </header>
+"""
+Atualiza data.json com os documentos R/TS do GMP+ FSA Requirements e as noticias
+GMP+ dos ultimos 3 meses.
 
-  <div class="cartoes">
-    <div class="cartao"><div class="num" id="total-docs">-</div><div class="rotulo">Documentos monitorados</div></div>
-    <div class="cartao alterado"><div class="num" id="docs-alterados">-</div><div class="rotulo">Atualizados na ultima verificacao</div></div>
-    <div class="cartao noticias"><div class="num" id="total-noticias">-</div><div class="rotulo">Noticias (ultimos 3 meses)</div></div>
-  </div>
+- Le o data.json atual como baseline (preserva categorias, historicos e logs).
+- Compara versoes: cada mudanca vira uma entrada em change_log.
+- Noticias que ainda nao estavam em news_log sao registradas como novas.
+- Se a raspagem falhar ou vier vazia, o data.json NAO e sobrescrito (exit 1).
+"""
+import json
+import re
+import sys
+from datetime import date, datetime, timedelta
+from pathlib import Path
+from urllib.parse import urljoin
 
-  <div class="controles">
-    <input type="text" id="busca" placeholder="Buscar por codigo ou titulo...">
-    <select id="filtro-categoria">
-      <option value="todos">Todas as categorias</option>
-    </select>
-    <label class="toggle"><input type="checkbox" id="somente-alterados"> Somente atualizados</label>
-  </div>
+import requests
+from bs4 import BeautifulSoup
 
-  <table>
-    <thead>
-      <tr>
-        <th>Codigo</th>
-        <th>Documento</th>
-        <th>Categoria</th>
-        <th>Versao atual</th>
-        <th>Situacao</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody id="linhas-docs"></tbody>
-  </table>
-  <div class="semres" id="sem-resultados" style="display:none;">Nenhum documento encontrado com esse filtro.</div>
+BASE = "https://www.gmpplus.org"
+SOURCE_PAGE = BASE + "/feed-certification-scheme/scheme-documents/fsa-requirements/"
+NEWS_PAGE = BASE + "/publications/news/"
+DATA_FILE = Path(__file__).with_name("data.json")
+NEWS_WINDOW_DAYS = 92  # ~3 meses
+HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; gmp-fsa-dashboard/1.0)"}
 
-  <secao class="historico">
-    <h2>Historico de alteracoes em documentos</h2>
-    <div id="historico-conteudo"></div>
-  </secao>
-
-  <secao class="noticias-secao">
-    <h2>Noticias GMP+</h2>
-    <p class="noticias-meta">
-      Fonte: <a href="https://www.gmpplus.org/publications/news/" target="_blank" rel="noopener">gmpplus.org/publications/news</a>
-      &nbsp;&middot;&nbsp; <span id="qtd-noticias">-</span> noticias dos ultimos 3 meses monitoradas
-      &nbsp;&middot;&nbsp; Noticias novas detectadas na ultima verificacao aparecem com <span class="emblema novo">NOVA</span>
-    </p>
-    <div class="noticias-controles">
-      <input type="text" id="busca-noticias" placeholder="Buscar nas noticias...">
-      <label class="toggle"><input type="checkbox" id="somente-novas"> Somente novas</label>
-    </div>
-    <div id="noticias-conteudo"></div>
-    <div class="semres" id="noticias-sem-resultados" style="display:none;">Nenhuma noticia encontrada com esse filtro.</div>
-  </secao>
-
-  <footer>
-    Painel atualizado a partir do arquivo de baseline local. Escopo de documentos: todos os R e TS do GMP+ FSA Requirements, com a categoria &ldquo;Transporte (especifico)&rdquo; destacada para TS1.9 e TS3.3. Escopo de noticias: publicacoes dos ultimos 3 meses em gmpplus.org/publications/news.
-  </footer>
-</div>
-
-<script>
-const DATA = {"source_page":"https://www.gmpplus.org/feed-certification-scheme/scheme-documents/fsa-requirements/","news_page":"https://www.gmpplus.org/publications/news/","scope":"Todos os documentos R e TS da pagina GMP+ FSA Requirements (cobertura completa, com destaque para os de transporte)","last_checked":"2026-10-06","documents":[{"id":"r10","code":"R1.0","title":"Feed Safety Management Systems Requirements","category":"Geral (FSMS)","version":"02.03.2026","view_url":"https://www.gmpplus.org/feed-certification-scheme/scheme-documents/fsa-requirements/r10/"},{"id":"ts11","code":"TS1.1","title":"Prerequisite programme","category":"Geral (FSMS)","version":"01.01.2024","view_url":"https://www.gmpplus.org/feed-certification-scheme/scheme-documents/fsa-requirements/ts11/"},{"id":"ts12","code":"TS1.2","title":"Purchase","category":"Geral (FSMS)","version":"02.03.2026","view_url":"https://www.gmpplus.org/feed-certification-scheme/scheme-documents/fsa-requirements/ts12/"},{"id":"ts13","code":"TS1.3","title":"Product list","category":"Geral (FSMS)","version":"01.03.2021","view_url":"https://www.gmpplus.org/feed-certification-scheme/scheme-documents/fsa-requirements/ts13/"},{"id":"ts14","code":"TS1.4","title":"Forbidden Products and Fuels","category":"Geral (FSMS)","version":"01.01.2022","view_url":"https://www.gmpplus.org/feed-certification-scheme/scheme-documents/fsa-requirements/ts14/"},{"id":"ts15","code":"TS1.5","title":"Specific feed safety limits","category":"Geral (FSMS)","version":"01.01.2024","view_url":"https://www.gmpplus.org/feed-certification-scheme/scheme-documents/fsa-requirements/ts15/"},{"id":"ts16","code":"TS1.6","title":"Sampling","category":"Geral (FSMS)","version":"01.01.2024","view_url":"https://www.gmpplus.org/feed-certification-scheme/scheme-documents/fsa-requirements/ts16/"},{"id":"ts17-new","code":"TS1.7","title":"Monitoring","category":"Geral (FSMS)","version":"02.03.2026","view_url":"https://www.gmpplus.org/feed-certification-scheme/scheme-documents/fsa-requirements/ts17-new/"},{"id":"aflatoxine-b1-protocol","code":"TS1.7","title":"Monitoring - Aflatoxin risk classification list","category":"Monitoramento / listas","version":"15.09.2026","view_url":"https://www.gmpplus.org/feed-certification-scheme/scheme-documents/fsa-requirements/aflatoxine-b1-protocol/"},{"id":"ts17-monitoring","code":"TS1.7","title":"Summary required submission analysis results","category":"Monitoramento / listas","version":"01.03.2021","view_url":"https://www.gmpplus.org/feed-certification-scheme/scheme-documents/fsa-requirements/ts17-monitoring/"},{"id":"ts18","code":"TS1.8","title":"Labelling","category":"Geral (FSMS)","version":"01.03.2021","view_url":"https://www.gmpplus.org/feed-certification-scheme/scheme-documents/fsa-requirements/ts18/"},{"id":"ts19","code":"TS1.9","title":"Transport activities","category":"Transporte (especifico)","version":"02.03.2026","view_url":"https://www.gmpplus.org/feed-certification-scheme/scheme-documents/fsa-requirements/ts19/"},{"id":"ts110","code":"TS1.10","title":"Operational activities","category":"Producao / operacional","version":"01.01.2022","view_url":"https://www.gmpplus.org/feed-certification-scheme/scheme-documents/fsa-requirements/ts110/"},{"id":"ts111","code":"TS1.11","title":"Control of residues & homogeneity","category":"Producao / operacional","version":"01.01.2022","view_url":"https://www.gmpplus.org/feed-certification-scheme/scheme-documents/fsa-requirements/ts111/"},{"id":"ts21","code":"TS2.1","title":"Country Note Dioxin monitoring for poultry feed","category":"Nota de pais","version":"01.01.2023","view_url":"https://www.gmpplus.org/feed-certification-scheme/scheme-documents/fsa-requirements/ts21/"},{"id":"ts22-new","code":"TS2.2","title":"Antibiotic-free feed (new)","category":"Nota de pais","version":"01.03.2025","view_url":"https://www.gmpplus.org/feed-certification-scheme/scheme-documents/fsa-requirements/ts22-new/"},{"id":"ts22","code":"TS2.2","title":"Country Note Antibiotic-free feed","category":"Nota de pais","version":"01.03.2021","view_url":"https://www.gmpplus.org/feed-certification-scheme/scheme-documents/fsa-requirements/ts22/"},{"id":"ts23","code":"TS2.3","title":"Country Note QM-Milch","category":"Nota de pais","version":"02.03.2026","view_url":"https://www.gmpplus.org/feed-certification-scheme/scheme-documents/fsa-requirements/ts23/"},{"id":"ts31","code":"TS3.1","title":"Trade to livestock farms","category":"Comercio (trade)","version":"01.01.2023","view_url":"https://www.gmpplus.org/feed-certification-scheme/scheme-documents/fsa-requirements/ts31/"},{"id":"ts32","code":"TS3.2","title":"Production and Trade of Pet foods","category":"Comercio (trade)","version":"01.01.2022","view_url":"https://www.gmpplus.org/feed-certification-scheme/scheme-documents/fsa-requirements/ts32/"},{"id":"ts33","code":"TS3.3","title":"Inland waterway transport and short sea shipping of feed","category":"Transporte (especifico)","version":"02.03.2026","view_url":"https://www.gmpplus.org/feed-certification-scheme/scheme-documents/fsa-requirements/ts33/"},{"id":"ts41","code":"TS4.1","title":"Laboratory Testing","category":"Laboratorio","version":"01.01.2023","view_url":"https://www.gmpplus.org/feed-certification-scheme/scheme-documents/fsa-requirements/ts41/"},{"id":"ts42","code":"TS4.2","title":"Registered laboratories","category":"Laboratorio","version":"01.01.2022","view_url":"https://www.gmpplus.org/feed-certification-scheme/scheme-documents/fsa-requirements/ts42/"}],"change_log":[{"id":"aflatoxine-b1-protocol","code":"TS1.7","title":"Monitoring - Aflatoxin risk classification list","old_version":"23.01.2026","new_version":"23.06.2026","detected_at":"2026-07-02"},{"id":"aflatoxine-b1-protocol","code":"TS1.7","title":"Monitoring - Aflatoxin risk classification list","old_version":"23.06.2026","new_version":"20.07.2026","detected_at":"2026-09-01"},{"id":"aflatoxine-b1-protocol","code":"TS1.7","title":"Monitoring - Aflatoxin risk classification list","old_version":"20.07.2026","new_version":"15.09.2026","detected_at":"2026-10-06"}],"news_items":[{"url":"https://www.gmpplus.org/publications/news/recognition-of-book-claim-and-mass-balance/","title":"Recognition of Book & Claim and Mass Balance for responsible soy continues beyond 2026","date_published":"2026-10-01"},{"url":"https://www.gmpplus.org/publications/news/building-strong-supplier-relationships-and-effective-audit-plans/","title":"GMP+ Academy webinar 26 November: Building strong supplier relationships and effective audit plans","date_published":"2026-09-28"},{"url":"https://www.gmpplus.org/publications/news/help-us-to-improve-our-services-take-our-short-survey-in-your-language/","title":"Share your feedback: Help us to improve our services, take our short survey in your language","date_published":"2026-09-28"},{"url":"https://www.gmpplus.org/publications/news/idtf-news-2-2026/","title":"International Database for Transport of Feed (IDTF) – Newsletter 2/2026","date_published":"2026-09-24"},{"url":"https://www.gmpplus.org/publications/news/protocol-monitoring-aflatoxin-b1-in-maize-and-by-products-of-maize-harvest-20262027/","title":"Protocol Monitoring Aflatoxin B1 in maize and by-products of maize - Harvest 2026/2027","date_published":"2026-09-15"},{"url":"https://www.gmpplus.org/publications/news/gmpplus-international-accepts-efisc-gtp-scope-road-transport-as-a-service-provider/","title":"GMP+ International accepts EFISC-GTP scope Road transport as a service provider","date_published":"2026-09-14"},{"url":"https://www.gmpplus.org/publications/news/please-be-aware-of-an-unauthorised-gmpplus-fsa-certificate/","title":"Please be aware of an unauthorised GMP+ FSA certificate","date_published":"2026-09-10"},{"url":"https://www.gmpplus.org/publications/news/temporary-measures-due-to-low-water-levels/","title":"Temporary measures due to low water levels in European rivers and canals","date_published":"2026-08-13"},{"url":"https://www.gmpplus.org/publications/news/registered-consultants-align-to-better-support/","title":"Registered Consultants align to better support GMP+ certified companies","date_published":"2026-07-28"},{"url":"https://www.gmpplus.org/publications/news/new-eu-regulation-on-new-genomic-techniques-adopted/","title":"New EU regulation on new genomic techniques adopted","date_published":"2026-07-27"},{"url":"https://www.gmpplus.org/publications/news/new-platform-features-my-early-warning-system-my-risk-assessments/","title":"New platform features: My Early Warning System & My Risk Assessments","date_published":"2026-07-27"},{"url":"https://www.gmpplus.org/publications/news/celebrating-5-years-of-gmpplus-academy/","title":"Celebrating 5 Years of GMP+ Academy","date_published":"2026-07-27"},{"url":"https://www.gmpplus.org/publications/news/gmpplus-product-list-passes-1-000-feed-materials/","title":"GMP+ Product List passes 1,000 feed materials","date_published":"2026-07-22"},{"url":"https://www.gmpplus.org/publications/news/afla-b1-july-2026/","title":"Protocol Monitoring Aflatoxin B1 in maize and by-products of maize (July 2026)","date_published":"2026-07-21"},{"url":"https://www.gmpplus.org/publications/news/contamination-of-maize-with-aflatoxin-b1-from-the-united-states/","title":"Contamination of maize with Aflatoxin B1 from the United States","date_published":"2026-07-09"}],"news_log":[{"url":"https://www.gmpplus.org/publications/news/temporary-measures-due-to-low-water-levels/","detected_at":"2026-09-01"},{"url":"https://www.gmpplus.org/publications/news/registered-consultants-align-to-better-support/","detected_at":"2026-09-01"},{"url":"https://www.gmpplus.org/publications/news/new-eu-regulation-on-new-genomic-techniques-adopted/","detected_at":"2026-09-01"},{"url":"https://www.gmpplus.org/publications/news/new-platform-features-my-early-warning-system-my-risk-assessments/","detected_at":"2026-09-01"},{"url":"https://www.gmpplus.org/publications/news/gmpplus-product-list-passes-1-000-feed-materials/","detected_at":"2026-09-01"},{"url":"https://www.gmpplus.org/publications/news/afla-b1-july-2026/","detected_at":"2026-09-01"},{"url":"https://www.gmpplus.org/publications/news/contamination-of-maize-with-aflatoxin-b1-from-the-united-states/","detected_at":"2026-09-01"},{"url":"https://www.gmpplus.org/publications/news/recognition-of-book-claim-and-mass-balance/","detected_at":"2026-10-06"},{"url":"https://www.gmpplus.org/publications/news/building-strong-supplier-relationships-and-effective-audit-plans/","detected_at":"2026-10-06"},{"url":"https://www.gmpplus.org/publications/news/help-us-to-improve-our-services-take-our-short-survey-in-your-language/","detected_at":"2026-10-06"},{"url":"https://www.gmpplus.org/publications/news/idtf-news-2-2026/","detected_at":"2026-10-06"},{"url":"https://www.gmpplus.org/publications/news/protocol-monitoring-aflatoxin-b1-in-maize-and-by-products-of-maize-harvest-20262027/","detected_at":"2026-10-06"},{"url":"https://www.gmpplus.org/publications/news/gmpplus-international-accepts-efisc-gtp-scope-road-transport-as-a-service-provider/","detected_at":"2026-10-06"},{"url":"https://www.gmpplus.org/publications/news/please-be-aware-of-an-unauthorised-gmpplus-fsa-certificate/","detected_at":"2026-10-06"},{"url":"https://www.gmpplus.org/publications/news/celebrating-5-years-of-gmpplus-academy/","detected_at":"2026-10-06"}]};
-
-function escaparHtml(s){
-  return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+TAB_CATEGORY = {
+    "requirements": "Geral (FSMS)",
+    "technical specifications": "Geral (FSMS)",
+    "country notes": "Nota de pais",
+    "hygiene codes": "Codigo de higiene",
+    "laboratory": "Laboratorio",
 }
+TRANSPORT_CODES = {"TS1.9", "TS3.3"}
+CODE_RE = re.compile(r"^\s*((?:R|TS)\s?\d+(?:\.\d+)*)\s*(.*)$", re.S)
+MONTHS = {m: i for i, m in enumerate(
+    ["january", "february", "march", "april", "may", "june", "july",
+     "august", "september", "october", "november", "december"], start=1)}
 
-function idsAlteradosNaUltimaVerificacao(){
-  const ultima = DATA.last_checked;
-  const conj = new Set();
-  (DATA.change_log || []).forEach(entrada => {
-    if (entrada.detected_at === ultima) conj.add(entrada.id || entrada.code);
-  });
-  return conj;
-}
 
-function urlsNovasNaUltimaVerificacao(){
-  const ultima = DATA.last_checked;
-  const conj = new Set();
-  (DATA.news_log || []).forEach(entrada => {
-    if (entrada.detected_at === ultima) conj.add(entrada.url);
-  });
-  return conj;
-}
+def get(url):
+    r = requests.get(url, headers=HEADERS, timeout=30)
+    r.raise_for_status()
+    return BeautifulSoup(r.text, "html.parser")
 
-function classeBadgeCategoria(cat){
-  return cat && cat.toLowerCase().includes("transporte") ? "transporte" : "geral";
-}
 
-let categoriasPreenchidas = false;
-function preencherFiltroCategorias(){
-  if (categoriasPreenchidas) return;
-  const sel = document.getElementById("filtro-categoria");
-  const cats = Array.from(new Set(DATA.documents.map(d => d.category))).sort();
-  cats.forEach(cat => {
-    const opt = document.createElement("option");
-    opt.value = cat;
-    opt.textContent = cat;
-    sel.appendChild(opt);
-  });
-  categoriasPreenchidas = true;
-}
+def clean(text):
+    return re.sub(r"\s+", " ", text or "").strip()
 
-function formatarData(iso){
-  if (!iso) return "-";
-  const [a, m, d] = iso.split("-");
-  return d + "/" + m + "/" + a;
-}
 
-function renderizar(){
-  preencherFiltroCategorias();
-  const conjAlterados = idsAlteradosNaUltimaVerificacao();
-  document.getElementById("link-fonte").href = DATA.source_page;
-  document.getElementById("ultima-verificacao").textContent = DATA.last_checked || "-";
-  document.getElementById("total-docs").textContent = DATA.documents.length;
-  document.getElementById("docs-alterados").textContent = conjAlterados.size;
-  document.getElementById("total-noticias").textContent = (DATA.news_items || []).length;
-  document.getElementById("qtd-noticias").textContent = (DATA.news_items || []).length;
-  const busca = document.getElementById("busca").value.trim().toLowerCase();
-  const categoria = document.getElementById("filtro-categoria").value;
-  const somenteAlterados = document.getElementById("somente-alterados").checked;
+def slug_from_url(url):
+    return url.rstrip("/").split("/")[-1]
 
-  const linhasHtml = [];
-  DATA.documents.forEach(doc => {
-    const alterado = conjAlterados.has(doc.id || doc.code);
-    if (categoria !== "todos" && doc.category !== categoria) return;
-    if (somenteAlterados && !alterado) return;
-    const haystack = (doc.code + " " + doc.title).toLowerCase();
-    if (busca && !haystack.includes(busca)) return;
 
-    linhasHtml.push(`
-      <tr>
-        <td class="codigo">${escaparHtml(doc.code)}</td>
-        <td>${escaparHtml(doc.title)}</td>
-        <td><span class="emblema ${classeBadgeCategoria(doc.category)}">${escaparHtml(doc.category)}</span></td>
-        <td>${escaparHtml(doc.version)}</td>
-        <td>
-          <span class="status ${alterado ? "alterado" : "ok"}">
-            <span class="ponto ${alterado ? "alterado" : "ok"}"></span>
-            ${alterado ? "Atualizado" : "Sem alteracoes"}
-          </span>
-        </td>
-        <td><a class="verlink" href="${escaparHtml(doc.view_url)}" target="_blank" rel="noopener">Ver documento &rarr;</a></td>
-      </tr>
-    `);
-  });
+def guess_category(code, title, tab_name):
+    if code in TRANSPORT_CODES or "transport" in title.lower():
+        return "Transporte (especifico)"
+    if code.startswith("TS1.7") and title.lower() != "monitoring":
+        return "Monitoramento / listas"
+    if code in {"TS1.10", "TS1.11"}:
+        return "Producao / operacional"
+    if code.startswith("TS3."):
+        return "Comercio (trade)"
+    return TAB_CATEGORY.get(tab_name.lower(), "Geral (FSMS)")
 
-  document.getElementById("linhas-docs").innerHTML = linhasHtml.join("");
-  document.getElementById("sem-resultados").style.display = linhasHtml.length ? "none" : "block";
 
-  const historico = (DATA.change_log || []).slice().sort((a,b) => (a.detected_at < b.detected_at ? 1 : -1));
-  const elHistorico = document.getElementById("historico-conteudo");
-  if (!historico.length){
-    elHistorico.innerHTML = '<div class="vazio">Nenhuma alteracao registrada ainda. O historico aparece aqui apos a primeira atualizacao detectada pela verificacao mensal.</div>';
-  } else {
-    elHistorico.innerHTML = `
-      <table>
-        <thead><tr><th>Data</th><th>Codigo</th><th>Documento</th><th>Versao anterior</th><th>Versao nova</th></tr></thead>
-        <tbody>
-          ${historico.map(h => `
-            <tr>
-              <td>${escaparHtml(h.detected_at)}</td>
-              <td class="codigo">${escaparHtml(h.code)}</td>
-              <td>${escaparHtml(h.title)}</td>
-              <td>${escaparHtml(h.old_version)}</td>
-              <td>${escaparHtml(h.new_version)}</td>
-            </tr>
-          `).join("")}
-        </tbody>
-      </table>
-    `;
-  }
+def scrape_documents(previous_by_id):
+    soup = get(SOURCE_PAGE)
+    tab_names = {}
+    for tab in soup.select("[role=tab]"):
+        target = tab.get("aria-controls") or (tab.get("data-bs-target") or "").lstrip("#")
+        if target:
+            tab_names[target] = clean(tab.get_text())
 
-  renderizarNoticias();
-}
+    docs = []
+    for card in soup.select("section.c-card__doc"):
+        h3 = card.find(["h3", "h2", "h4"])
+        if not h3:
+            continue
+        m = CODE_RE.match(clean(h3.get_text()))
+        if not m:
+            continue
+        code = m.group(1).replace(" ", "")
+        title = m.group(2).strip(" -–")
+        title = re.sub(r"^Monitoring\s*[–-]\s*", "Monitoring - ", title)
 
-function renderizarNoticias(){
-  const urlsNovas = urlsNovasNaUltimaVerificacao();
-  const buscaNot = document.getElementById("busca-noticias").value.trim().toLowerCase();
-  const somenteNovas = document.getElementById("somente-novas").checked;
+        ver_el = card.select_one(".c-card__doc-version")
+        version = clean(ver_el.get_text()).replace("Version", "").strip() if ver_el else ""
 
-  const itens = (DATA.news_items || []).slice().sort((a,b) => a.date_published < b.date_published ? 1 : -1);
-  const filtrados = itens.filter(n => {
-    if (somenteNovas && !urlsNovas.has(n.url)) return false;
-    if (buscaNot && !n.title.toLowerCase().includes(buscaNot)) return false;
-    return true;
-  });
+        links = card.find_all("a", href=True)
+        view = next((a for a in links if clean(a.get_text()).lower() == "view online"), None)
+        view = view or (links[0] if links else None)
+        view_url = urljoin(BASE, view["href"]) if view else SOURCE_PAGE
 
-  const el = document.getElementById("noticias-conteudo");
-  const semRes = document.getElementById("noticias-sem-resultados");
-  if (!filtrados.length){
-    el.innerHTML = "";
-    semRes.style.display = "block";
-    return;
-  }
-  semRes.style.display = "none";
-  el.innerHTML = `
-    <table>
-      <thead><tr><th>Data</th><th>Noticia</th></tr></thead>
-      <tbody>
-        ${filtrados.map(n => {
-          const nova = urlsNovas.has(n.url);
-          return `<tr>
-            <td class="col-data">${escaparHtml(formatarData(n.date_published))}</td>
-            <td>
-              <a class="notlink" href="${escaparHtml(n.url)}" target="_blank" rel="noopener">${escaparHtml(n.title)}</a>
-              ${nova ? '<span class="emblema novo">NOVA</span>' : ''}
-            </td>
-          </tr>`;
-        }).join("")}
-      </tbody>
-    </table>
-  `;
-}
+        doc_id = slug_from_url(view_url) if view else f"{code}-{title}".lower()
+        pane = card.find_parent(attrs={"role": "tabpanel"})
+        tab_name = tab_names.get(pane.get("id"), "") if pane else ""
+        prev = previous_by_id.get(doc_id, {})
 
-document.getElementById("busca").addEventListener("input", renderizar);
-document.getElementById("filtro-categoria").addEventListener("change", renderizar);
-document.getElementById("somente-alterados").addEventListener("change", renderizar);
-document.getElementById("busca-noticias").addEventListener("input", renderizarNoticias);
-document.getElementById("somente-novas").addEventListener("change", renderizarNoticias);
-renderizar();
-</script>
-</body>
-</html>
+        docs.append({
+            "id": doc_id,
+            "code": code,
+            "title": title,
+            "category": prev.get("category") or guess_category(code, title, tab_name),
+            "version": version,
+            "view_url": view_url,
+        })
+    return docs
+
+
+def parse_news_date(text):
+    m = re.search(r"(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})", text or "")
+    if not m or m.group(2).lower() not in MONTHS:
+        return None
+    return date(int(m.group(3)), MONTHS[m.group(2).lower()], int(m.group(1)))
+
+
+def scrape_news(today):
+    soup = get(NEWS_PAGE)
+    limit = today - timedelta(days=NEWS_WINDOW_DAYS)
+    items, seen = [], set()
+    for a in soup.select("a.publications__item"):
+        url = urljoin(BASE, a.get("href", ""))
+        title_el = a.select_one(".publications__item-title")
+        date_el = a.select_one(".publications__item-date")
+        published = parse_news_date(date_el.get_text() if date_el else "")
+        if not title_el or not published or url in seen:
+            continue
+        seen.add(url)
+        if published >= limit:
+            items.append({"url": url, "title": clean(title_el.get_text()),
+                          "date_published": published.isoformat()})
+    items.sort(key=lambda n: n["date_published"], reverse=True)
+    return items
+
+
+def main():
+    today = date.today()
+    data = json.loads(DATA_FILE.read_text(encoding="utf-8")) if DATA_FILE.exists() else {}
+    previous_docs = {d.get("id") or d.get("code"): d for d in data.get("documents", [])}
+
+    try:
+        docs = scrape_documents(previous_docs)
+        news = scrape_news(today)
+    except Exception as exc:  # rede, HTML alterado etc.
+        print(f"ERRO na raspagem: {exc}", file=sys.stderr)
+        sys.exit(1)
+
+    if not docs:
+        print("ERRO: nenhum documento encontrado; data.json mantido sem alteracoes.", file=sys.stderr)
+        sys.exit(1)
+
+    checked = today.isoformat()
+    change_log = data.get("change_log", [])
+    for d in docs:
+        prev = previous_docs.get(d["id"])
+        if prev and prev.get("version") and prev["version"] != d["version"]:
+            change_log.append({"id": d["id"], "code": d["code"], "title": d["title"],
+                               "old_version": prev["version"], "new_version": d["version"],
+                               "detected_at": checked})
+            print(f"Atualizado: {d['code']} {d['title']} {prev['version']} -> {d['version']}")
+        elif not prev and previous_docs:
+            change_log.append({"id": d["id"], "code": d["code"], "title": d["title"],
+                               "old_version": "(novo documento)", "new_version": d["version"],
+                               "detected_at": checked})
+            print(f"Novo documento: {d['code']} {d['title']}")
+
+    news_log = data.get("news_log", [])
+    known = {n["url"] for n in news_log}
+    for n in news:
+        if n["url"] not in known:
+            news_log.append({"url": n["url"], "detected_at": checked})
+
+    data.update({
+        "source_page": SOURCE_PAGE,
+        "news_page": NEWS_PAGE,
+        "scope": data.get("scope") or "Todos os documentos R e TS da pagina GMP+ FSA Requirements",
+        "last_checked": checked,
+        "documents": docs,
+        "change_log": change_log,
+        "news_items": news,
+        "news_log": news_log,
+    })
+    DATA_FILE.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    print(f"OK: {len(docs)} documentos, {len(news)} noticias (ultimos {NEWS_WINDOW_DAYS} dias).")
+
+
+if __name__ == "__main__":
+    main()
